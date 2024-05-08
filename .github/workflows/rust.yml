@@ -24,6 +24,7 @@ jobs:
     - name: Update rust toolshain and install component
       run: |
           rustup component add llvm-tools-preview
+          rustup target add thumbv7em-none-eabihf
           rustup update
     - uses: Swatinem/rust-cache@v2
     - name: Install cargo bins
