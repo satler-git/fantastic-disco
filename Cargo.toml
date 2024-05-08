@@ -4,3 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+
+[features]
+default = ["microbit-v2"]
+v2 = ["microbit-v2"]
+v1 = ["microbit"]
