@@ -1,0 +1,42 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: awalsh128/cache-apt-pkgs-action@latest
+      with:
+        packages: libudev-dev gdb-multiarch minicom
+        version: 1.0
+    - name: Update rust toolshain and install component
+      run: |
+          rustup component add llvm-tools-preview
+          rustup target add thumbv7em-none-eabihf
+          rustup update
+    - uses: Swatinem/rust-cache@v2
+    - name: Install cargo bins
+      run: |
+        cargo install cargo-binutils
+        cargo install cargo-embed
+    - name: Build
+      run: cargo build --verbose
+    - name: Run tests
+      run: cargo test --verbose
+    - name: Upload firmware
+      uses: actions/upload-artifact@v4
+      with:
+        name: firm-${{ github.sha }}
+        path: ./target/debug/ # TODO: ファイルを記述
