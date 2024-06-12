@@ -23,10 +23,8 @@ jobs:
         python-version: '3.7.17'
     - name: Download script
       run: curl https://raw.githubusercontent.com/python-intelhex/intelhex/master/intelhex/scripts/bin2hex.py -o bin2hex.py
-    - uses: BSFishy/pip-action@v1
-      with: 
-        packages: |
-          intelhex
+    - name: Install pip package
+      run: pip install intelhex
     - uses: awalsh128/cache-apt-pkgs-action@latest
       with:
         packages: libudev-dev gdb-multiarch minicom
