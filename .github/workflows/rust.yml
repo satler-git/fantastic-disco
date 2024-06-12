@@ -17,17 +17,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Setup Python
-      uses: actions/setup-python@v5.1.0
-      with:
-        python-version: '3.7.17'
-    - name: Download script
-      run: curl https://raw.githubusercontent.com/python-intelhex/intelhex/master/intelhex/scripts/bin2hex.py -o bin2hex.py
-    - name: Install pip package
-      run: pip install intelhex
     - uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: libudev-dev gdb-multiarch minicom
+        packages: libudev-dev gdb-multiarch minicom binutils-arm-none-eabi
         version: 1.0
     - name: Update rust toolshain and install component
       run: |
@@ -38,7 +30,7 @@ jobs:
     - name: Build
       run: cargo build --verbose --release
     - name: Convert to hex
-      run: python bin2hex.py ./target/thumbv7em-none-eabihf/release/fantastic-disco ./fantastic-disco.hex
+      run: objcopy -O ihex ./target/thumbv7em-none-eabihf/release/fantastic-disco fantastic-disco.hex
     - name: Move file
       run: |
         mkdir firm
