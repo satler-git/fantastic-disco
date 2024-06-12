@@ -27,14 +27,10 @@ jobs:
           rustup target add thumbv7em-none-eabihf
           rustup update
     - uses: Swatinem/rust-cache@v2
-    - name: Install cargo bins
-      run: |
-        cargo install cargo-binutils
-        cargo install cargo-embed
     - name: Build
       run: cargo build --verbose
     - name: Upload firmware
       uses: actions/upload-artifact@v4
       with:
         name: firm-${{ github.sha }}
-        path: ./target/debug/ # TODO: ファイルを記述
+        path: ./target/debug/fantastic-disco # TODO: ファイルを記述
