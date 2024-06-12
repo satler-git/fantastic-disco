@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "preLaunchTask": "${defaultBuildTask}",
+      "type": "probe-rs-debug",
+      "request": "launch",
+      "name": "probe_rs Execute",
+      "flashingConfig": {
+        "flashingEnabled": true,
+        "formatOptions": {
+          "binaryFormat": "hex"
+        }
+      },
+      "chip": "nRF52833_xxAA",
+      "coreConfigs": [
+        {
+          //!MODIFY
+          "programBinary": "target/thumbv7em-none-eabihf/release/fantastic-disco"
+        }
+      ]
+    }
+  ]
+}
