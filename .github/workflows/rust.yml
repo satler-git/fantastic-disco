@@ -38,9 +38,14 @@ jobs:
     - name: Build
       run: cargo build --verbose --release
     - name: Convert to hex
-      run: python bin2hex.py ./target/thumbv7em-none-eabihf/release/fantastic-disco ./fantastic-disco.hex
+      run: python bin2hex.py ./target/release/fantastic-disco ./fantastic-disco.hex
+    - name: Move file
+      run: |
+        mkdir firm
+        cp ./target/release/fantastic-disco ./firm
+        cp ./fantastic-disco.hex            ./firm
     - name: Upload firmware
       uses: actions/upload-artifact@v4
       with:
         name: firm-${{ github.sha }}
-        path: ./fantastic-disco.hex # TODO: ファイルを記述
+        path: ./firm # TODO: ファイルを記述
