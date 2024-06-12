@@ -33,5 +33,6 @@ async fn main(_spawner: Spawner) {
                     .await;
             }
         }
+        display.scroll("Hello, World!").await;
     }
 }
