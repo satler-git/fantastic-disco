@@ -28,9 +28,9 @@ jobs:
           rustup update
     - uses: Swatinem/rust-cache@v2
     - name: Build
-      run: cargo build --verbose
+      run: cargo build --verbose --release
     - name: Upload firmware
       uses: actions/upload-artifact@v4
       with:
         name: firm-${{ github.sha }}
-        path: ./target/thumbv7em-none-eabihf/debug/fantastic-disco # TODO: ファイルを記述
+        path: ./target/thumbv7em-none-eabihf/release/fantastic-disco # TODO: ファイルを記述
