@@ -17,6 +17,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Setup Python
+      uses: actions/setup-python@v5.1.0
+      with: 
+        python-version: '3.6'
+    - uses: BSFishy/pip-action@v1
+      with: 
+        packages: |
+          intelhex
     - uses: awalsh128/cache-apt-pkgs-action@latest
       with:
         packages: libudev-dev gdb-multiarch minicom
@@ -29,8 +37,10 @@ jobs:
     - uses: Swatinem/rust-cache@v2
     - name: Build
       run: cargo build --verbose --release
+    - name: Convert to hex
+      run: python bin2hex.py ./target/thumbv7em-none-eabihf/release/fantastic-disco ./fantastic-disco.hex
     - name: Upload firmware
       uses: actions/upload-artifact@v4
       with:
         name: firm-${{ github.sha }}
-        path: ./target/thumbv7em-none-eabihf/release/fantastic-disco # TODO: ファイルを記述
+        path: ./fantastic-disco.hex # TODO: ファイルを記述
