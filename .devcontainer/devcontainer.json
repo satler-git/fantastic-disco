@@ -1,0 +1,10 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/devcontainers/features/rust:1": {},
+    "ghcr.io/akhildevelops/devcontainer-features/apt:0": {
+      "PACKAGES": "libudev-dev,gdb-multiarch,minicom,binutils-arm-none-eabi"
+    }
+  },
+  "postCreateCommand": "chmod +x .devcontainer/postCreateCommand.sh && .devcontainer/postCreateCommand.sh"
+}
