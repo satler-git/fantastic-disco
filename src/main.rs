@@ -4,6 +4,7 @@
 use embassy_executor::Spawner;
 use embassy_nrf::gpio::Level;
 use embassy_time::{Duration, Delay};
+use embedded_hal_async::delay::DelayNs;
 use microbit_bsp::*;
 use {defmt_rtt as _, panic_probe as _};
 
@@ -42,6 +43,6 @@ async fn main(_spawner: Spawner) {
             }
             _ => {}
         }
-        delay.delay_ms(50);
+        delay.delay_ms(50).await;
     }
 }
