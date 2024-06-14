@@ -29,7 +29,7 @@ jobs:
     - name: Build
       run: cargo build --verbose --release
     - name: Convert to hex
-      run: objcopy -O ihex ./target/thumbv7em-none-eabihf/release/fantastic-disco
+      run: objcopy -O ihex ./target/thumbv7em-none-eabihf/release/fantastic-disco ./fantastic-disco.hex
     - name: Upload firmware
       uses: actions/upload-artifact@v4
       with:
