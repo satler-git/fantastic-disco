@@ -3,13 +3,14 @@
 
 use embassy_executor::Spawner;
 use embassy_nrf::gpio::Level;
-use embassy_time::Duration;
+use embassy_time::{Duration, Delay};
 use microbit_bsp::*;
 use {defmt_rtt as _, panic_probe as _};
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
     let board = Microbit::default();
+    let mut delay = Delay;
 
     let mut display = board.display;
     let btn_a = board.btn_a;
@@ -41,5 +42,6 @@ async fn main(_spawner: Spawner) {
             }
             _ => {}
         }
+        delay.delay_ms(50);
     }
 }
