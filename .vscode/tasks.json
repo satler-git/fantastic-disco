@@ -3,7 +3,7 @@
 	"tasks": [
 		{
 			"type": "cargo",
-			"command": "build",
+			"command": "build --release",
 			"problemMatcher": [
 				"$rustc"
 			],
@@ -16,7 +16,7 @@
 			"type": "shell",
 			"dependsOn": ["rust: cargo build"],
 			"dependsOrder": "sequence",
-			"command": "objcopy -O ihex ./target/thumbv7em-none-eabihf/debug/fantastic-disco ./target/thumbv7em-none-eabihf/debug/fantastic-disco.hex",
+			"command": "objcopy -O ihex ./target/thumbv7em-none-eabihf/release/fantastic-disco ./target/thumbv7em-none-eabihf/debug/fantastic-disco.hex",
 			"group": {
 				"kind": "build",
 				"isDefault": true
