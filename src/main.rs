@@ -10,7 +10,6 @@ use {defmt_rtt as _, panic_probe as _};
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
     let board = Microbit::default();
-    let mut delay = Delay;
 
     let mut display = board.display;
     let btn_a = board.btn_a;
