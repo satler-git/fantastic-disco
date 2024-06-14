@@ -16,7 +16,7 @@
       "coreConfigs": [
         {
           //!MODIFY
-          "programBinary": "target/thumbv7em-none-eabihf/release/fantastic-disco"
+          "programBinary": "target/thumbv7em-none-eabihf/release/fantastic-disco.hex"
         }
       ]
     }

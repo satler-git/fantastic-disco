@@ -1,0 +1,27 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cargo",
+			"command": "build",
+			"problemMatcher": [
+				"$rustc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
+			"label": "rust: cargo build",
+		},{
+			"type": "shell",
+			"dependsOn": ["rust: cargo build"],
+			"dependsOrder": "sequence",
+			"command": "objcopy -O ihex ./target/thumbv7em-none-eabihf/debug/fantastic-disco ./target/thumbv7em-none-eabihf/debug/fantastic-disco.hex",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"label": "build: hex (debug)",
+		}
+	]
+}
