@@ -4,7 +4,8 @@
     "ghcr.io/devcontainers/features/rust:1": {},
     "ghcr.io/akhildevelops/devcontainer-features/apt:0": {
       "PACKAGES": "libudev-dev,gdb-multiarch,minicom,binutils-arm-none-eabi"
-    }
+    },
+    "ghcr.io/devcontainers/features/nix:1" : {}
   },
   "postCreateCommand": "chmod +x .devcontainer/postCreateCommand.sh && .devcontainer/postCreateCommand.sh"
 }
