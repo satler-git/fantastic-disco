@@ -1,0 +1,8 @@
+version: '3'
+
+tasks:
+  build:
+    cmds:
+      - cargo build --release
+      - objcopy -O ihex ./target/thumbv7em-none-eabihf/release/fantastic-disco fantastic-disco.hex
+    silent: true
