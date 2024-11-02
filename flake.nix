@@ -35,6 +35,9 @@
         }:
         let
           treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
+          rust-bin = pkgs.rust-bin.stable.latest.default.override {
+            targets = [ "thumbv7em-none-eabihf" ];
+          };
         in
         {
           _module.args.pkgs = import inputs.nixpkgs {
@@ -56,11 +59,6 @@
 
           devShells.default = pkgs.mkShell {
             nativeBuildInputs =
-              let
-                rust-bin = pkgs.rust-bin.stable.latest.default.override {
-                  targets = [ "thumbv7em-none-eabihf" ];
-                };
-              in
               with pkgs;
               [
                 binutils-unwrapped-all-targets
@@ -75,9 +73,17 @@
               ++ [ rust-bin ];
           };
 
-          packages.default = pkgs.rustPlatform.buildRustPackage {
+          packages.default = let
+            rustPlatform = pkgs.makeRustPlatform {
+                cargo = rust-bin;
+                rustc = rust-bin;
+              };
+            in
+            rustPlatform.buildRustPackage {
             pname = "fantastic-disco";
             version = "0.1.0";
+
+            target = "thumbv7em-none-eabihf";
 
             buildInputs = with pkgs; [
               binutils-unwrapped-all-targets
