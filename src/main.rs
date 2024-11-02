@@ -3,13 +3,13 @@
 
 use embassy_executor::Spawner;
 use embassy_nrf::gpio::Level;
-use embassy_time::{Duration, Timer};
-use microbit_bsp::*;
-use {defmt_rtt as _, panic_probe as _};
-use microbit_bsp::speaker::PwmSpeaker;
 use embassy_nrf::pwm::SimplePwm;
+use embassy_time::{Duration, Timer};
 use microbit::board::Board;
 use microbit::hal::temp::Temp;
+use microbit_bsp::speaker::PwmSpeaker;
+use microbit_bsp::*;
+use {defmt_rtt as _, panic_probe as _};
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
@@ -29,10 +29,7 @@ async fn main(_spawner: Spawner) {
             (Level::High, Level::Low) | (Level::Low, Level::High) => {
                 let temp: f32 = tmp_sen.measure().to_num();
                 let mut buf = [0u8; 10];
-                let s = format_no_std::show(
-                    &mut buf,
-                    format_args!("{} C", temp as i32),
-                ).unwrap();
+                let s = format_no_std::show(&mut buf, format_args!("{} C", temp as i32)).unwrap();
                 display.scroll(&s).await;
             }
             _ => (),
