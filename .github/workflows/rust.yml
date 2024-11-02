@@ -19,7 +19,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      RUSTFLAGS: "-A warnings"   # 環境変数を指定
+      RUSTFLAGS: ""
 
     steps:
     - uses: actions/checkout@v4
