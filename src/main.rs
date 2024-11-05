@@ -3,7 +3,7 @@
 
 use core::ops::{Range, RangeInclusive};
 
-use display::Frame;
+use display::{Bitmap, Frame};
 use embassy_executor::Spawner;
 use embassy_nrf::gpio::{AnyPin, Level};
 use embassy_nrf::pwm::SimplePwm;
@@ -44,11 +44,25 @@ enum Mode {
     Viewer(ScrollPoint),
 }
 
+impl State {
+    fn render(&self) -> Frame<5, 5> {
+        match self.mode {
+            Mode::ModeSelect => todo!(),
+            Mode::Viewer(_) => self.render_viewer(),
+            Mode::Timer {
+                from: _,
+                duration: _,
+                reverse: _,
+            } => self.mode.render_timer(),
+        }
+    }
+
+    fn render_viewer(&self) -> Frame<5, 5> {
+        todo!()
+    }
+}
+
 impl Mode {
-    /// 円グラフのように表示する
-    /// n/16となる
-    /// reverseなら反時計回りで光っていく
-    /// !reverseなら時計回りで消えていく
     fn render_timer(&self) -> Frame<5, 5> {
         if let Mode::Timer {
             from,
@@ -102,40 +116,63 @@ async fn main(_spawner: Spawner) {
     let board_not_embassy = Board::take().unwrap();
 
     let mut display = board.display;
-    display
-        .display(
-            Mode::render_timer(&Mode::Timer {
-                from: Instant::from_secs(40),
-                duration: Duration::from_secs(60),
-                reverse: false,
-            }),
-            Duration::from_secs(10),
-        )
-        .await;
+    // display
+    //     .display(
+    //         Mode::render_timer(&Mode::Timer {
+    //             from: Instant::from_secs(40),
+    //             duration: Duration::from_secs(60),
+    //             reverse: false,
+    //         }),
+    //         Duration::from_secs(10),
+    //     )
+    //     .await;
     let mut btn_a = board.btn_a;
     let mut btn_b = board.btn_b;
 
-    display.set_brightness(display::Brightness::new(128));
     defmt::info!("Application started, press buttons!");
     // let mut speacker = PwmSpeaker::new(SimplePwm::new_1ch(board.pwm0, board.speaker));
     let tmp_sen = Temp::new(board_not_embassy.TEMP);
+    let mut state = false;
     loop {
-        defmt::info!("{} {}", btn_a.get_level(), btn_b.get_level());
-        match (btn_a.get_level(), btn_b.get_level()) {
-            (Level::High, Level::Low) => {
-                block_for_high(&mut btn_a, &mut btn_b, (false, true)).await
-            }
-            (Level::Low, Level::High) => {
-                block_for_high(&mut btn_a, &mut btn_b, (true, false)).await
-            }
-            // (Level::High, Level::Low) | (Level::Low, Level::High) => {
-            //     let temp: f32 = tmp_sen.measure().to_num();
-            //     let mut buf = [0u8; 10];
-            //     let s = format_no_std::show(&mut buf, format_args!("{} C", temp as i32)).unwrap();
-            //     display.scroll(&s).await;
-            // }
-            _ => (),
+        if state {
+            let frame = Frame::new([
+                Bitmap::new(0b11000, 5),
+                Bitmap::new(0b11000, 5),
+                Bitmap::new(0b11000, 5),
+                Bitmap::new(0b11000, 5),
+                Bitmap::new(0b11000, 5),
+            ]);
+            display.set_brightness(display::Brightness::new(4));
+            display.display(frame, Duration::from_millis(2)).await;
+            state = false;
+        } else {
+            let frame = Frame::new([
+                Bitmap::new(0b00011, 5),
+                Bitmap::new(0b00011, 5),
+                Bitmap::new(0b00011, 5),
+                Bitmap::new(0b00011, 5),
+                Bitmap::new(0b00011, 5),
+            ]);
+            display.set_brightness(display::Brightness::new(255));
+            display.display(frame, Duration::from_millis(2)).await;
+            state = true;
         }
-        Timer::after_millis(100).await;
+        // defmt::info!("{} {}", btn_a.get_level(), btn_b.get_level());
+        // match (btn_a.get_level(), btn_b.get_level()) {
+        //     (Level::High, Level::Low) => {
+        //         block_for_high(&mut btn_a, &mut btn_b, (false, true)).await
+        //     }
+        //     (Level::Low, Level::High) => {
+        //         block_for_high(&mut btn_a, &mut btn_b, (true, false)).await
+        //     }
+        //     // (Level::High, Level::Low) | (Level::Low, Level::High) => {
+        //     //     let temp: f32 = tmp_sen.measure().to_num();
+        //     //     let mut buf = [0u8; 10];
+        //     //     let s = format_no_std::show(&mut buf, format_args!("{} C", temp as i32)).unwrap();
+        //     //     display.scroll(&s).await;
+        //     // }
+        //     _ => (),
+        // }
+        // Timer::after_millis(100).await;
     }
 }
