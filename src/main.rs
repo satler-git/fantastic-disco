@@ -44,14 +44,6 @@ enum Mode {
     Viewer(ScrollPoint),
 }
 
-fn set_range(f: &mut Frame<5, 5>, xr: RangeInclusive<usize>, yr: RangeInclusive<usize>) {
-    for x in xr {
-        for y in yr.clone() {
-            f.set(x, y);
-        }
-    }
-}
-
 impl Mode {
     /// 円グラフのように表示する
     /// n/16となる
@@ -64,40 +56,22 @@ impl Mode {
             reverse,
         } = self
         {
-            let mut soto = (from.as_millis() / (duration.as_millis() / 16)) % 16;
-            let mut naka = (from.as_millis() / (duration.as_millis() / 8)) % 8;
             let mut f = Frame::empty();
-            set_range(&mut f, 2..=2, 0..=2);
-            if !*reverse {
-                soto = 16 - soto;
-                naka = 8 - naka;
-            }
-            let soto = soto;
-            let naka = naka;
-            set_range(&mut f, (3 - soto.min(3) as usize)..=2, 0..=0);
-            if soto > 3 {
-                set_range(&mut f, 0..=0, 0..=(soto.min(7) as usize - 3));
-            }
-            if soto > 7 {
-                set_range(&mut f, 0..=(soto.min(11) as usize - 7), 4..=4);
-            }
-            if soto > 11 {
-                set_range(&mut f, 4..=4, 0..=4 - (soto.min(12) as usize - 12));
-            }
-            if naka > 1 {
-                set_range(&mut f, 1..=1, 1..=(naka.min(3) as usize));
-            }
-            if naka > 5 {
-                set_range(&mut f, 3..=3, 1..=3 - (naka.min(6) as usize - 5));
-            }
-            if soto >= 5 {
-                f.set(2, 3)
-            }
-            if soto >= 6 {
-                f.set(3, 3)
-            }
-            if soto == 16 {
-                f.set(3, 0);
+            let kyori = {
+                let mut kyori = from.as_millis() / (duration.as_millis() / 9);
+                kyori = kyori.min(9);
+                if *reverse {
+                    kyori = 9 - kyori;
+                }
+                kyori
+            };
+            defmt::info!("kyori: {}", kyori);
+            for x in 0..5 {
+                for y in 0..5 {
+                    if x + y <= kyori - 1 {
+                        f.set(x as usize, y as usize);
+                    }
+                }
             }
             f
         } else {
@@ -133,7 +107,7 @@ async fn main(_spawner: Spawner) {
             Mode::render_timer(&Mode::Timer {
                 from: Instant::from_secs(40),
                 duration: Duration::from_secs(60),
-                reverse: true,
+                reverse: false,
             }),
             Duration::from_secs(10),
         )
