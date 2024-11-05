@@ -60,6 +60,9 @@ impl State {
         }
     }
 
+    /// ブロッキングしても良い
+    fn new_state(self, input: (Level, Level)) -> (Self) {}
+
     fn render_viewer(&self) -> Frame<5, 5> {
         if let Mode::Viewer(sp) = self.mode {
             let mut f = Frame::empty();
