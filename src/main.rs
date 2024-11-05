@@ -30,6 +30,9 @@ async fn block_for_high<'a>(
 struct State {
     pub times: [OneBlock; 256],
     pub mode: Mode,
+    /// FrameCount, オーバーフローしたらリセットしていい。
+    /// 時間を計測するために使わないこと
+    pub counter: u64,
 }
 
 type ScrollPoint = u8;
@@ -58,7 +61,22 @@ impl State {
     }
 
     fn render_viewer(&self) -> Frame<5, 5> {
-        todo!()
+        if let Mode::Viewer(sp) = self.mode {
+            let mut f = Frame::empty();
+            if sp >= 5 {
+                defmt::error!(
+                    "ScrollPoint is bigger than 4, in this time, show you p4(p0 is first page)."
+                );
+            }
+            f.set(sp.min(4) as usize, 0); // ScrollBar
+                                          // TODO:
+            f
+        } else {
+            defmt::error!(
+                "A non-Viewer Mode was passed to `render_viewer`. This is probably an error."
+            );
+            Frame::empty()
+        }
     }
 }
 
