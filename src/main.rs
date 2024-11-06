@@ -87,6 +87,7 @@ impl State {
             );
             Frame::empty()
         }
+    }
 }
 
 impl Mode {
