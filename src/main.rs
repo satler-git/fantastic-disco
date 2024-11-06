@@ -288,7 +288,7 @@ impl State {
             let off_at = off_mae + display_blocks[off].count;
             let mut times = 0;
             for y in 0..5 {
-                for x in 0..5 {
+                for x in 1..5 {
                     times += 1;
                     if off_mae <= times && off_at >= times {
                         f.set(x, y);
