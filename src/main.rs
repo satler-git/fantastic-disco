@@ -87,7 +87,6 @@ impl State {
             );
             Frame::empty()
         }
-    }
 }
 
 impl Mode {
@@ -124,6 +123,7 @@ impl Mode {
         }
     }
 }
+
 /// 切り捨て
 struct Block {
     pub kind: BlockKind,
