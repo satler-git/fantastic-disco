@@ -150,7 +150,7 @@ impl State {
                         if sp == 1 {
                             Mode::Timer {
                                 from: Instant::now(),
-                                duration: Duration::from_secs(60 * 3),
+                                duration: Duration::from_secs(60 * 25),
                                 reverse: false,
                             }
                         } else if sp == 2 {
