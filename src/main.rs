@@ -28,7 +28,7 @@ async fn block_for_high<'a>(
 }
 
 struct State {
-    pub times: [OneBlock; 256],
+    pub times: [Block; 100], // 4 * 5 * 5 // lines * rows * minutes
     pub mode: Mode,
     /// FrameCount, オーバーフローしたらリセットしていい。
     /// 時間を計測するために使わないこと
@@ -117,11 +117,8 @@ impl Mode {
         }
     }
 }
-
-struct OneBlock {
-    /// 5分 * `count`
-    /// 切り捨て
-    pub count: u8,
+/// 切り捨て
+struct Block {
     pub kind: BlockKind,
 }
 
