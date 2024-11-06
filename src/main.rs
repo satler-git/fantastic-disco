@@ -61,7 +61,14 @@ impl State {
     }
 
     /// ブロッキングしても良い
-    fn new_state(self, input: (Level, Level)) -> (Self) {}
+    /// -> (new_state, final_sleep_mills)
+    fn new_state(self, input: (Level, Level), prev_sleep_mills: u32) -> (Self, u32) {
+        (State {
+            times: self.times,
+            mode: self.mode,
+            counter: self.counter + 1,
+        }, prev_sleep_mills)
+    }
 
     fn render_viewer(&self) -> Frame<5, 5> {
         if let Mode::Viewer(sp) = self.mode {
