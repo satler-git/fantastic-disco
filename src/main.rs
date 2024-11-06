@@ -61,7 +61,7 @@ impl State {
         let btn_b = board.btn_b;
         let mut bottun_state = (Level::Low, Level::Low);
         let mut state = self;
-        let mut interval = 100;
+        let mut interval = DEFAULT_INTERVAL;
         loop {
             let now_bottun_state = (btn_a.get_level(), btn_b.get_level());
             if now_bottun_state.0 != bottun_state.0 {
