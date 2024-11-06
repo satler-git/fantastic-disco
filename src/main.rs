@@ -77,9 +77,8 @@ impl State {
             (state, interval) = state.new_state(bottun_state, interval);
             board
                 .display
-                .display(state.render(), Duration::from_millis(50))
+                .display(state.render(), Duration::from_millis(interval as u64))
                 .await;
-            Timer::after_millis(interval as u64).await;
             // defmt::debug!("{:?}", state);
             // defmt::debug!("{}", now_bottun_state);
         }
