@@ -1,36 +1,30 @@
 #![no_std]
 #![no_main]
 
-use core::default;
-use core::ops::{Range, RangeInclusive};
-
 use heapless::Vec;
 
 use display::{Bitmap, Frame};
 use embassy_executor::Spawner;
 use embassy_nrf::gpio::{AnyPin, Level};
-use embassy_nrf::pwm::SimplePwm;
-use embassy_time::{Duration, Instant, Timer};
-use microbit::board::Board;
-use microbit::hal::temp::Temp;
-use microbit_bsp::speaker::PwmSpeaker;
+use embassy_time::{Duration, Instant};
 use microbit_bsp::*;
 use {defmt_rtt as _, panic_probe as _};
 
-const DEFAULT_INTERVAL: u32 = 50;
+#[embassy_executor::main]
+async fn main(_spawner: Spawner) {
+    let board = Microbit::default();
+    // let board_not_embassy = Board::take().unwrap();
 
-/// `low_pin` の0はbtn_a, 1はbtn_bに対応していてそのピンがlowになるまでブロックする
-async fn block_for_high<'a>(
-    btn_a: &mut embassy_nrf::gpio::Input<'a, AnyPin>,
-    btn_b: &mut embassy_nrf::gpio::Input<'a, AnyPin>,
-    low_pin: (bool, bool),
-) {
-    loop {
-        if (btn_a.is_high() || !low_pin.0) && (btn_b.is_high() || !low_pin.1) {
-            break;
-        }
-    }
+    defmt::info!("Application started, press buttons!");
+    let state = State {
+        times: Vec::new(),
+        mode: Mode::ModeSelect(0),
+        counter: 0,
+    };
+    state.event_loop(board).await;
 }
+
+const DEFAULT_INTERVAL: u32 = 50;
 
 #[derive(defmt::Format, PartialEq, Eq)]
 struct State {
@@ -41,20 +35,8 @@ struct State {
     pub counter: u64,
 }
 
-type ScrollPoint = u8;
-
-#[derive(defmt::Format, PartialEq, Eq)]
-enum Mode {
-    ModeSelect(u8),
-    Timer {
-        from: Instant,
-        duration: Duration,
-        reverse: bool,
-    },
-    Viewer(ScrollPoint),
-}
-
 impl State {
+
     async fn event_loop(self, board: Microbit) {
         let mut board = board;
         let btn_a = board.btn_a;
@@ -81,50 +63,6 @@ impl State {
                 .await;
             // defmt::debug!("{:?}", state);
             // defmt::debug!("{}", now_bottun_state);
-        }
-    }
-
-    fn render(&self) -> Frame<5, 5> {
-        match self.mode {
-            Mode::ModeSelect(_) => self.render_select(),
-            Mode::Viewer(_) => self.render_viewer(),
-            Mode::Timer {
-                from: _,
-                duration: _,
-                reverse: _,
-            } => self.mode.render_timer(),
-        }
-    }
-
-    fn render_select(&self) -> Frame<5, 5> {
-        if let Mode::ModeSelect(s) = self.mode {
-            if s == 1 {
-                Frame::new([
-                    Bitmap::new(0b11000, 5),
-                    Bitmap::new(0b11000, 5),
-                    Bitmap::new(0b11000, 5),
-                    Bitmap::new(0b11000, 5),
-                    Bitmap::new(0b11000, 5),
-                ])
-            } else if s == 2 {
-                Frame::new([
-                    Bitmap::new(0b00011, 5),
-                    Bitmap::new(0b00011, 5),
-                    Bitmap::new(0b00011, 5),
-                    Bitmap::new(0b00011, 5),
-                    Bitmap::new(0b00011, 5),
-                ])
-            } else {
-                Frame::new([
-                    Bitmap::new(0b00100, 5),
-                    Bitmap::new(0b00100, 5),
-                    Bitmap::new(0b00100, 5),
-                    Bitmap::new(0b00100, 5),
-                    Bitmap::new(0b00100, 5),
-                ])
-            }
-        } else {
-            Frame::empty()
         }
     }
 
@@ -190,7 +128,7 @@ impl State {
                     //     duration.as_millis()
                     // );
                     if reverse {
-                        s.times.push(Block {
+                        let _ = s.times.push(Block {
                             count: 1,
                             kind: BlockKind::Rest,
                         });
@@ -203,7 +141,7 @@ impl State {
                             prev_sleep_mills,
                         )
                     } else {
-                        s.times.push(Block {
+                        let _ = s.times.push(Block {
                             count: 5,
                             kind: BlockKind::Other(0),
                         });
@@ -245,6 +183,50 @@ impl State {
                     prev_sleep_mills,
                 )
             }
+        }
+    }
+
+    fn render(&self) -> Frame<5, 5> {
+        match self.mode {
+            Mode::ModeSelect(_) => self.render_select(),
+            Mode::Viewer(_) => self.render_viewer(),
+            Mode::Timer {
+                from: _,
+                duration: _,
+                reverse: _,
+            } => self.mode.render_timer(),
+        }
+    }
+
+    fn render_select(&self) -> Frame<5, 5> {
+        if let Mode::ModeSelect(s) = self.mode {
+            if s == 1 {
+                Frame::new([
+                    Bitmap::new(0b11000, 5),
+                    Bitmap::new(0b11000, 5),
+                    Bitmap::new(0b11000, 5),
+                    Bitmap::new(0b11000, 5),
+                    Bitmap::new(0b11000, 5),
+                ])
+            } else if s == 2 {
+                Frame::new([
+                    Bitmap::new(0b00011, 5),
+                    Bitmap::new(0b00011, 5),
+                    Bitmap::new(0b00011, 5),
+                    Bitmap::new(0b00011, 5),
+                    Bitmap::new(0b00011, 5),
+                ])
+            } else {
+                Frame::new([
+                    Bitmap::new(0b00100, 5),
+                    Bitmap::new(0b00100, 5),
+                    Bitmap::new(0b00100, 5),
+                    Bitmap::new(0b00100, 5),
+                    Bitmap::new(0b00100, 5),
+                ])
+            }
+        } else {
+            Frame::empty()
         }
     }
 
@@ -305,6 +287,19 @@ impl State {
     }
 }
 
+type ScrollPoint = u8;
+
+#[derive(defmt::Format, PartialEq, Eq)]
+enum Mode {
+    ModeSelect(u8),
+    Timer {
+        from: Instant,
+        duration: Duration,
+        reverse: bool,
+    },
+    Viewer(ScrollPoint),
+}
+
 impl Mode {
     fn render_timer(&self) -> Frame<5, 5> {
         if let Mode::Timer {
@@ -355,18 +350,4 @@ enum BlockKind {
     Rest,
     // typeを記録できるように
     Other(u8),
-}
-
-#[embassy_executor::main]
-async fn main(_spawner: Spawner) {
-    let board = Microbit::default();
-    let board_not_embassy = Board::take().unwrap();
-
-    defmt::info!("Application started, press buttons!");
-    let state = State {
-        times: Vec::new(),
-        mode: Mode::ModeSelect(0),
-        counter: 0,
-    };
-    state.event_loop(board).await;
 }
