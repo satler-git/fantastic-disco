@@ -3,11 +3,13 @@
 
 use heapless::Vec;
 
-use display::{Bitmap, Frame};
 use embassy_executor::Spawner;
-use embassy_nrf::gpio::{AnyPin, Level};
 use embassy_time::{Duration, Instant};
+use embassy_nrf::gpio::Level;
+
 use microbit_bsp::*;
+use display::{Bitmap, Frame};
+
 use {defmt_rtt as _, panic_probe as _};
 
 #[embassy_executor::main]
