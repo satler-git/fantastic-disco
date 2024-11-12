@@ -37,8 +37,22 @@ struct State {
     pub counter: u64,
 }
 
-impl State {
+/// 切り捨て
+#[derive(defmt::Format, PartialEq, Eq)]
+struct Block {
+    /// 5分 * count
+    count: u8,
+    pub kind: BlockKind,
+}
 
+#[derive(defmt::Format, PartialEq, Eq)]
+enum BlockKind {
+    Rest,
+    // typeを記録できるように
+    Other(u8),
+}
+
+impl State {
     async fn event_loop(self, board: Microbit) {
         let mut board = board;
         let btn_a = board.btn_a;
@@ -190,45 +204,13 @@ impl State {
 
     fn render(&self) -> Frame<5, 5> {
         match self.mode {
-            Mode::ModeSelect(_) => self.render_select(),
+            Mode::ModeSelect(_) => self.mode.render_select(),
             Mode::Viewer(_) => self.render_viewer(),
             Mode::Timer {
                 from: _,
                 duration: _,
                 reverse: _,
             } => self.mode.render_timer(),
-        }
-    }
-
-    fn render_select(&self) -> Frame<5, 5> {
-        if let Mode::ModeSelect(s) = self.mode {
-            if s == 1 {
-                Frame::new([
-                    Bitmap::new(0b11000, 5),
-                    Bitmap::new(0b11000, 5),
-                    Bitmap::new(0b11000, 5),
-                    Bitmap::new(0b11000, 5),
-                    Bitmap::new(0b11000, 5),
-                ])
-            } else if s == 2 {
-                Frame::new([
-                    Bitmap::new(0b00011, 5),
-                    Bitmap::new(0b00011, 5),
-                    Bitmap::new(0b00011, 5),
-                    Bitmap::new(0b00011, 5),
-                    Bitmap::new(0b00011, 5),
-                ])
-            } else {
-                Frame::new([
-                    Bitmap::new(0b00100, 5),
-                    Bitmap::new(0b00100, 5),
-                    Bitmap::new(0b00100, 5),
-                    Bitmap::new(0b00100, 5),
-                    Bitmap::new(0b00100, 5),
-                ])
-            }
-        } else {
-            Frame::empty()
         }
     }
 
@@ -337,19 +319,37 @@ impl Mode {
             Frame::empty()
         }
     }
+
+    fn render_select(&self) -> Frame<5, 5> {
+        if let Mode::ModeSelect(s) = self {
+            if s == 1 {
+                Frame::new([
+                    Bitmap::new(0b11000, 5),
+                    Bitmap::new(0b11000, 5),
+                    Bitmap::new(0b11000, 5),
+                    Bitmap::new(0b11000, 5),
+                    Bitmap::new(0b11000, 5),
+                ])
+            } else if s == 2 {
+                Frame::new([
+                    Bitmap::new(0b00011, 5),
+                    Bitmap::new(0b00011, 5),
+                    Bitmap::new(0b00011, 5),
+                    Bitmap::new(0b00011, 5),
+                    Bitmap::new(0b00011, 5),
+                ])
+            } else {
+                Frame::new([
+                    Bitmap::new(0b00100, 5),
+                    Bitmap::new(0b00100, 5),
+                    Bitmap::new(0b00100, 5),
+                    Bitmap::new(0b00100, 5),
+                    Bitmap::new(0b00100, 5),
+                ])
+            }
+        } else {
+            Frame::empty()
+        }
+    }
 }
 
-/// 切り捨て
-#[derive(defmt::Format, PartialEq, Eq)]
-struct Block {
-    /// 5分 * count
-    count: u8,
-    pub kind: BlockKind,
-}
-
-#[derive(defmt::Format, PartialEq, Eq)]
-enum BlockKind {
-    Rest,
-    // typeを記録できるように
-    Other(u8),
-}
