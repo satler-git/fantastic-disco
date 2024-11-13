@@ -321,8 +321,8 @@ impl Mode {
     }
 
     fn render_select(&self) -> Frame<5, 5> {
-        if let Mode::ModeSelect(&s) = self {
-            if s == 1 {
+        if let Mode::ModeSelect(s) = self {
+            if *s == 1 {
                 Frame::new([
                     Bitmap::new(0b11000, 5),
                     Bitmap::new(0b11000, 5),
@@ -330,7 +330,7 @@ impl Mode {
                     Bitmap::new(0b11000, 5),
                     Bitmap::new(0b11000, 5),
                 ])
-            } else if s == 2 {
+            } else if *s == 2 {
                 Frame::new([
                     Bitmap::new(0b00011, 5),
                     Bitmap::new(0b00011, 5),
